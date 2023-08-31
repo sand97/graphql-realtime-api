@@ -1,0 +1,66 @@
+type Medicament {
+    id: ID!
+    name: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    image: String!
+    categoryId: ID!
+    category: Category!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    description: String!
+    createdAt: String!
+    updatedAt: String!
+}
+
+input NewCategory {
+    name: String!
+    description: String!
+}
+
+input NewMedicament {
+    name: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    image: String!
+    categoryId: ID!
+}
+
+input UpdateCategory {
+    id: ID!
+    name: String
+    description: String
+}
+
+input UpdateMedicament {
+    id: ID!
+    name: String
+    description: String
+    price: Float
+    stock: Int
+    image: String
+    categoryId: ID
+}
+
+type Query {
+    medicaments: [Medicament!]!
+    medicament(id: ID!): Medicament!
+    categories: [Category!]!
+    category(id: ID!): Category!
+}
+
+type Mutation {
+    createCategory(input: NewCategory!): Category!
+    updateCategory(input: UpdateCategory!): Category!
+    deleteCategory(id: ID!): Category!
+    createMedicament(input: NewMedicament!): Medicament!
+    updateMedicament(input: UpdateMedicament!): Medicament!
+    deleteMedicament(id: ID!): Medicament!
+}
