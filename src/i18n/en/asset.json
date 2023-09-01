@@ -1,0 +1,6 @@
+{
+  "incorrect_file_format": "Only JPEG, PNG, Webp or Avif file types are supported",
+  "asset_created_successful": "File uploaded successfully",
+  "delete_success": "File uploaded successfully",
+  "already_deleted": "This file has already been deleted"
+}

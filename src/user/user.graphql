@@ -1,0 +1,50 @@
+type User {
+    # Example field (placeholder)
+    id: ID!
+    name: String!
+    surname: String
+    email: String! @constraint(format: "email", maxLength: 255)
+    password: String! @constraint(maxLength: 255, minLength: 8)
+    phone: String
+    role: String
+    avatar: String
+    createdAt: String!
+    updatedAt: String!
+}
+
+type LoginResponse {
+    expiresIn: String!
+    Authorization: String!
+    user: User!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input UpdatePasswordInput {
+    oldPassword: String!
+    newPassword: String!
+}
+
+input CreateOrUpdateUserInput {
+    name: String!
+    surname: String
+    email: String!
+    password: String!
+    phone: String
+    avatar: String
+}
+
+type Query {
+    login(loginInput: LoginInput!): LoginResponse!
+    me: User
+}
+
+type Mutation {
+    updateUser(updateUserInput: CreateOrUpdateUserInput!): User!
+    updatePassword(updatePasswordInput: UpdatePasswordInput!): User!
+    removeUser(id: Int!): User
+    sign(signInput: CreateOrUpdateUserInput!): LoginResponse!
+}
