@@ -6,7 +6,7 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { CreateOrUpdateUserInput, LoginInput, LoginResponse } from '../graphql';
-import { RenderUser } from '../user/user.utils';
+import { RenderUser, UserRole } from '../user/user.utils';
 
 // import {User} from "../users/user.entity";
 
@@ -33,6 +33,14 @@ export class AuthService {
   }
 
   async sign(payload: CreateOrUpdateUserInput): Promise<LoginResponse> {
+    // check if any user exists in db
+    const users = await this.prisma.user.findMany();
+    if (users.length > 0) {
+      throw new HttpException(
+        await this.i18n.translate('auth.USER_EXISTS'),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     // find user in db
     const user = await this.usersService.create(payload);
 
@@ -41,6 +49,7 @@ export class AuthService {
 
     return {
       ...token,
+      role: UserRole.ADMIN,
       user: new RenderUser(user),
     };
   }

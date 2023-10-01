@@ -14,3 +14,6 @@ export class GraphqlAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(new ExecutionContextHost([req]));
   }
 }
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {}

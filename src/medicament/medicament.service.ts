@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NewMedicament, UpdateMedicament } from '../graphql';
-import { Medicament } from '@prisma/client';
+import { Medicament, User } from '@prisma/client';
 
 @Injectable()
 export class MedicamentService {
@@ -23,10 +23,11 @@ export class MedicamentService {
     });
   }
 
-  async create(params: NewMedicament): Promise<Medicament> {
+  async create(user: User, params: NewMedicament): Promise<Medicament> {
     return this.prisma.medicament.create({
       data: {
         ...params,
+        createdById: user.id,
         categoryId: params.categoryId as string,
       },
     });

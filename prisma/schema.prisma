@@ -22,6 +22,26 @@ model User {
   language  Locale?  @default(fr)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  medicamentsCreated Medicament[]
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  items OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  order       Order    @relation(fields: [orderId], references: [id])
+  orderId     String
+  medicament  Medicament @relation(fields: [medicamentId], references: [id])
+  medicamentId String
+  quantity    Int
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Category {
@@ -39,11 +59,17 @@ model Medicament {
   description String
   price       Int
   stock       Int
+  available   Int @default(0)
   image       String
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  orderItems      OrderItem[]
 }
 
 enum Locale {
