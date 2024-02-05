@@ -1,11 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { I18nService } from 'nestjs-i18n';
-import { CreateAssetDto } from './asset.dto';
 import { MinioClientService } from '../minio-client/minio-client.service';
 import { ConfigService } from '@nestjs/config';
 import { AssetUrlService } from './asset.url.service';
-import sharp from 'sharp';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -32,7 +30,7 @@ export class AssetService {
    * 2 => Launch job tasks to process another images format
    *
    */
-  async uploadFile(file: any, dto: CreateAssetDto) {
+  async uploadFile(file: any) {
     if (
       !(
         file.mimetype.includes('jpeg') ||
@@ -47,13 +45,7 @@ export class AssetService {
       );
     }
 
-    if (
-      !(await this.prisma.medicament.findFirst({
-        where: { id: dto.medicamentId },
-      }))
-    ) {
-      throw new HttpException('Medicament not exist', HttpStatus.NOT_FOUND);
-    }
+    const sharp = require('sharp');
 
     const timestamp = Date.now().toString();
     const hashedFileName = crypto
@@ -63,9 +55,7 @@ export class AssetService {
 
     const extension = 'avif';
 
-    const id = dto.medicamentId;
-
-    const fileNameThumbnail = `${hashedFileName}-${id}-thumbnail.${extension}`;
+    const fileNameThumbnail = `${hashedFileName}-thumbnail.${extension}`;
 
     const compressedFileThumbnail = await sharp(file.buffer)
       .resize({
@@ -81,18 +71,9 @@ export class AssetService {
       `image/${extension}`,
     );
 
-    const data = await this.prisma.medicament.update({
-      where: {
-        id,
-      },
-      data: {
-        image: this.assetUrlService.getFileUrl(fileNameThumbnail),
-      },
-    });
-
     return {
       message: await this.i18n.translate('asset.asset_created_successful'),
-      data,
+      image: this.assetUrlService.getFileUrl(fileNameThumbnail),
     };
   }
 }

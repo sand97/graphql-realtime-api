@@ -36,6 +36,12 @@ export class UpdateCategory {
     description?: Nullable<string>;
 }
 
+export class FetchMedicamentsInput {
+    page: number;
+    limit: number;
+    keyword?: Nullable<string>;
+}
+
 export class UpdateMedicament {
     id: string;
     name?: Nullable<string>;
@@ -72,7 +78,7 @@ export class Auth {
 export abstract class IQuery {
     abstract auth(id: number): Nullable<Auth> | Promise<Nullable<Auth>>;
 
-    abstract medicaments(): Medicament[] | Promise<Medicament[]>;
+    abstract medicaments(payload: FetchMedicamentsInput): MedicamentPage | Promise<MedicamentPage>;
 
     abstract medicament(id: string): Medicament | Promise<Medicament>;
 
@@ -124,6 +130,11 @@ export class Medicament {
     category: Category;
     createdAt: string;
     updatedAt: string;
+}
+
+export class MedicamentPage {
+    medicaments: Medicament[];
+    count: number;
 }
 
 export class Category {

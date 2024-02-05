@@ -21,6 +21,7 @@ import {
   constraintDirective,
   constraintDirectiveTypeDefs,
 } from 'graphql-constraint-directive';
+import { AssetModule } from './asset/asset.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import {
     CategoryModule,
     AuthModule,
     UserModule,
+    AssetModule,
   ],
   providers: [],
 })

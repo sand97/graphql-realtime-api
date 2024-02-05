@@ -11,6 +11,11 @@ type Medicament {
     updatedAt: String!
 }
 
+type MedicamentPage {
+    medicaments: [Medicament!]!
+    count: Int!
+}
+
 type Category {
     id: ID!
     name: String!
@@ -39,6 +44,12 @@ input UpdateCategory {
     description: String
 }
 
+input FetchMedicamentsInput {
+    page: Int!
+    limit: Int!
+    keyword: String
+}
+
 input UpdateMedicament {
     id: ID!
     name: String
@@ -50,7 +61,7 @@ input UpdateMedicament {
 }
 
 type Query {
-    medicaments: [Medicament!]!
+    medicaments(payload: FetchMedicamentsInput!):  MedicamentPage!
     medicament(id: ID!): Medicament!
     categories: [Category!]!
     category(id: ID!): Category!

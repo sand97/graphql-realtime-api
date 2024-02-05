@@ -1,5 +1,4 @@
 import {
-  Body,
   CallHandler,
   Controller,
   ExecutionContext,
@@ -15,12 +14,10 @@ import {
 import { ApiBody, ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
-import { validate } from 'class-validator';
 import { AssetService } from './asset.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateAssetDto } from './asset.dto';
 
 @Injectable()
 export class FileExtender implements NestInterceptor {
@@ -52,8 +49,6 @@ export class AssetController {
     schema: {
       type: 'object',
       properties: {
-        productVariantId: { type: 'string' },
-        storeId: { type: 'string' },
         image: {
           type: 'string',
           format: 'binary',
@@ -63,29 +58,7 @@ export class AssetController {
   })
   @UseInterceptors(FileExtender)
   @UseInterceptors(FileInterceptor('image'))
-  async uploadFile(@UploadedFile('file') image, @Body() body) {
-    const dto = new CreateAssetDto();
-
-    Object.keys(body).forEach((key) => {
-      const v = body[key];
-      dto[key] = ['false', 'true'].includes(v)
-        ? JSON.parse(v)
-        : isNaN(v)
-        ? v
-        : Number(v);
-    });
-
-    const errors = await validate(dto);
-
-    if (errors.length > 0)
-      throw new HttpException(
-        {
-          message: await this.i18n.t('auth.please_fill_all_fields'),
-          errors,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-
-    return await this.assetService.uploadFile(image, dto);
+  async uploadFile(@UploadedFile('file') image) {
+    return await this.assetService.uploadFile(image);
   }
 }

@@ -1,6 +1,10 @@
 import { MedicamentService } from './medicament.service';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { NewMedicament, UpdateMedicament } from '../graphql';
+import {
+  FetchMedicamentsInput,
+  NewMedicament,
+  UpdateMedicament,
+} from '../graphql';
 import { UseGuards } from '@nestjs/common';
 import { GraphqlAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../user/user.decorator';
@@ -12,8 +16,8 @@ export class MedicamentResolver {
 
   @UseGuards(GraphqlAuthGuard)
   @Query('medicaments')
-  async medicaments() {
-    return this.medicamentService.findAll();
+  async medicaments(@Args('payload') dto: FetchMedicamentsInput) {
+    return this.medicamentService.findAll(dto);
   }
 
   @UseGuards(GraphqlAuthGuard)

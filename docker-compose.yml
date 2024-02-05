@@ -18,7 +18,7 @@ services:
     env_file:
       - .env
     networks:
-      - webnet
+      - network
     depends_on:
       - redis
       - minio
@@ -40,13 +40,13 @@ services:
     volumes:
       - red_data:/var/lib/redis
     networks:
-      - webnet
+      - network
 
   postgres:
     container_name: postgres
     image: postgres:12
     networks:
-      - webnet
+      - network
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -63,7 +63,7 @@ services:
     volumes:
       - /Users/new/Documents/project/mboafashion/data/minio:/data
     networks:
-      webnet:
+      network:
         ipv4_address: 172.18.0.50
     ports:
       - ${MINIO_PORT}:${MINIO_PORT}
@@ -75,7 +75,7 @@ services:
     command: ["server", "--console-address", ":9001", "/data"]
 
 networks:
-  webnet:
+  network:
     ipam:
       config:
         - subnet: 172.18.0.0/16

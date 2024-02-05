@@ -1,18 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { NewMedicament, UpdateMedicament } from '../graphql';
+import {
+  FetchMedicamentsInput,
+  NewMedicament,
+  UpdateMedicament,
+  MedicamentPage,
+} from '../graphql';
 import { Medicament, User } from '@prisma/client';
 
 @Injectable()
 export class MedicamentService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Medicament[]> {
-    return this.prisma.medicament.findMany({
+  async findAll(dto: FetchMedicamentsInput): Promise<MedicamentPage> {
+    const { page, limit, keyword } = dto;
+    const where = keyword
+      ? {
+          OR: [
+            {
+              name: {
+                contains: keyword,
+              },
+            },
+            {
+              description: {
+                contains: keyword,
+              },
+            },
+          ],
+        }
+      : undefined;
+    const count = await this.prisma.medicament.count({ where });
+    const medicaments = (await this.prisma.medicament.findMany({
       include: {
         category: true,
       },
-    });
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+    })) as any;
+    return {
+      medicaments,
+      count,
+    };
   }
 
   async findOne(id: string): Promise<Medicament> {
@@ -25,6 +55,9 @@ export class MedicamentService {
 
   async create(user: User, params: NewMedicament): Promise<Medicament> {
     return this.prisma.medicament.create({
+      include: {
+        category: true,
+      },
       data: {
         ...params,
         createdById: user.id,
@@ -38,6 +71,9 @@ export class MedicamentService {
     return this.prisma.medicament.update({
       where: {
         id,
+      },
+      include: {
+        category: true,
       },
       data: {
         ...params_without_id,
