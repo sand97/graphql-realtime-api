@@ -8,10 +8,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class CreateAuthInput {
-    exampleField?: Nullable<number>;
-}
-
 export class UpdateAuthInput {
     id: number;
 }
@@ -52,6 +48,12 @@ export class UpdateMedicament {
     categoryId?: Nullable<string>;
 }
 
+export class FetchUsersInput {
+    page: number;
+    limit: number;
+    keyword?: Nullable<string>;
+}
+
 export class LoginInput {
     email: string;
     password: string;
@@ -67,6 +69,15 @@ export class CreateOrUpdateUserInput {
     surname?: Nullable<string>;
     email: string;
     password: string;
+    phone?: Nullable<string>;
+    avatar?: Nullable<string>;
+}
+
+export class UpdateUserInput {
+    name: string;
+    surname?: Nullable<string>;
+    email: string;
+    password?: Nullable<string>;
     phone?: Nullable<string>;
     avatar?: Nullable<string>;
 }
@@ -89,11 +100,11 @@ export abstract class IQuery {
     abstract login(loginInput: LoginInput): LoginResponse | Promise<LoginResponse>;
 
     abstract me(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(payload: FetchUsersInput): UserPage | Promise<UserPage>;
 }
 
 export abstract class IMutation {
-    abstract createAuth(createAuthInput: CreateAuthInput): Auth | Promise<Auth>;
-
     abstract updateAuth(updateAuthInput: UpdateAuthInput): Auth | Promise<Auth>;
 
     abstract removeAuth(id: number): Nullable<Auth> | Promise<Nullable<Auth>>;
@@ -110,11 +121,13 @@ export abstract class IMutation {
 
     abstract deleteMedicament(id: string): Medicament | Promise<Medicament>;
 
-    abstract updateUser(updateUserInput: CreateOrUpdateUserInput): User | Promise<User>;
+    abstract updateUser(userId: string, updateUserInput: UpdateUserInput): User | Promise<User>;
+
+    abstract createUser(createUserInput: CreateOrUpdateUserInput): User | Promise<User>;
 
     abstract updatePassword(updatePasswordInput: UpdatePasswordInput): User | Promise<User>;
 
-    abstract removeUser(id: number): Nullable<User> | Promise<Nullable<User>>;
+    abstract removeUser(id: string): Nullable<RemoveUserResponse> | Promise<Nullable<RemoveUserResponse>>;
 
     abstract sign(signInput: CreateOrUpdateUserInput): LoginResponse | Promise<LoginResponse>;
 }
@@ -158,10 +171,19 @@ export class User {
     updatedAt: string;
 }
 
+export class UserPage {
+    users: User[];
+    count: number;
+}
+
 export class LoginResponse {
     expiresIn: string;
     Authorization: string;
     user: User;
+}
+
+export class RemoveUserResponse {
+    id: string;
 }
 
 type Nullable<T> = T | null;

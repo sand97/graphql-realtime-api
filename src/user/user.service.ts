@@ -1,13 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateOrUpdateUserInput, LoginInput } from '../graphql';
+import {
+  CreateOrUpdateUserInput,
+  FetchUsersInput,
+  LoginInput,
+  UpdateUserInput,
+  UserPage,
+} from '../graphql';
 import { JwtPayload } from '../auth/jwt.strategy';
 import { User, Locale } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
-// import { CreateUserInput } from './dto/create-user.input';
-// import { UpdateUserInput } from './dto/update-user.input';
 import { compare, hash } from 'bcrypt';
-import { RenderUser } from './user.utils';
+import { RenderUser, UserRole } from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -30,7 +34,7 @@ export class UserService {
   }
 
   async update(
-    payload: CreateOrUpdateUserInput,
+    payload: UpdateUserInput,
     id: string,
     currentUser: User,
   ): Promise<User> {
@@ -59,29 +63,43 @@ export class UserService {
     return new RenderUser(user);
   }
 
-  // async updatePassword(payload: UpdaPa, id: string): Promise<User> {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { id },
-  //   });
-  //   if (!user) {
-  //     throw new HttpException(
-  //       await this.i18n.translate('auth.invalid_credentials'),
-  //       HttpStatus.UNAUTHORIZED,
-  //     );
-  //   }
-  //   // compare passwords
-  //   const areEqual = await compare(payload.old_password, user.password);
-  //   if (!areEqual) {
-  //     throw new HttpException(
-  //       await this.i18n.translate('auth.invalid_credentials'),
-  //       HttpStatus.UNAUTHORIZED,
-  //     );
-  //   }
-  //   return await this.prisma.user.update({
-  //     where: { id },
-  //     data: { password: await hash(payload.new_password, 10) },
-  //   });
-  // }
+  async remove(id: string) {
+    return this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async findAll(dto: FetchUsersInput): Promise<UserPage> {
+    const { page, limit, keyword } = dto;
+    const where = keyword
+      ? {
+          OR: [
+            {
+              name: {
+                contains: keyword,
+              },
+            },
+            {
+              surname: {
+                contains: keyword,
+              },
+            },
+          ],
+        }
+      : undefined;
+    const count = await this.prisma.user.count({ where });
+    const users = (await this.prisma.user.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+    })) as any;
+    return {
+      users,
+      count,
+    };
+  }
 
   async findByPayload({ email }: JwtPayload): Promise<User | undefined> {
     return await this.prisma.user.findFirst({
@@ -122,7 +140,11 @@ export class UserService {
     return user;
   }
 
-  async create(userDto: CreateOrUpdateUserInput): Promise<any> {
+  async create(
+    userDto: CreateOrUpdateUserInput & {
+      role?: UserRole;
+    },
+  ): Promise<any> {
     // // check if the user exists in the db
     const userInDb = await this.prisma.user.findFirst({
       where: { email: userDto.email },
@@ -135,9 +157,9 @@ export class UserService {
     }
     return await this.prisma.user.create({
       data: {
+        role: 'CLIENT' as const,
         ...userDto,
         password: await hash(userDto.password, 10),
-        role: 'CLIENT' as const,
       },
     });
   }

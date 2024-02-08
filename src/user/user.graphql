@@ -12,10 +12,26 @@ type User {
     updatedAt: String!
 }
 
+input FetchUsersInput {
+    page: Int!
+    limit: Int!
+    keyword: String
+}
+
+type UserPage {
+    users: [User!]!
+    count: Int!
+}
+
+
 type LoginResponse {
     expiresIn: String!
     Authorization: String!
     user: User!
+}
+
+type RemoveUserResponse {
+    id: String!
 }
 
 input LoginInput {
@@ -37,14 +53,26 @@ input CreateOrUpdateUserInput {
     avatar: String
 }
 
+
+input UpdateUserInput {
+    name: String!
+    surname: String
+    email: String!
+    password: String
+    phone: String
+    avatar: String
+}
+
 type Query {
     login(loginInput: LoginInput!): LoginResponse!
     me: User
+    users(payload: FetchUsersInput!): UserPage!
 }
 
 type Mutation {
-    updateUser(updateUserInput: CreateOrUpdateUserInput!): User!
+    updateUser(userId: String!, updateUserInput: UpdateUserInput!): User!
+    createUser(createUserInput: CreateOrUpdateUserInput!): User!
     updatePassword(updatePasswordInput: UpdatePasswordInput!): User!
-    removeUser(id: Int!): User
+    removeUser(id: String!): RemoveUserResponse
     sign(signInput: CreateOrUpdateUserInput!): LoginResponse!
 }

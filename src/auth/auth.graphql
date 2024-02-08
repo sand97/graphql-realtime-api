@@ -3,10 +3,6 @@ type Auth {
   exampleField: Int
 }
 
-input CreateAuthInput {
-  # Example field (placeholder)
-  exampleField: Int
-}
 
 input UpdateAuthInput {
   id: Int!
@@ -17,7 +13,6 @@ type Query {
 }
 
 type Mutation {
-  createAuth(createAuthInput: CreateAuthInput!): Auth!
   updateAuth(updateAuthInput: UpdateAuthInput!): Auth!
   removeAuth(id: Int!): Auth
 }

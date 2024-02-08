@@ -42,7 +42,10 @@ export class AuthService {
       );
     }
     // find user in db
-    const user = await this.usersService.create(payload);
+    const user = await this.usersService.create({
+      ...payload,
+      role: UserRole.ROOT,
+    });
 
     // generate and sign token
     const token = this._createToken(user as User);
