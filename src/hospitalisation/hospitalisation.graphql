@@ -1,0 +1,44 @@
+type Hospitalisation {
+    id: ID!
+    customer: User,
+    userId: ID,
+    bed: Bed,
+    bedId: ID,
+    createdAt: String!
+    endAt: String!
+}
+
+type HospitalisationPage {
+    data: [Hospitalisation!]!
+    count: Int!
+}
+
+
+input FetchHospitalisationInput {
+    page: Int!
+    limit: Int!
+    userId: ID!
+}
+
+input NewHospitalisationInput {
+    userId: ID!
+    bedId: ID!
+}
+
+input UpdateHospitalisationInput {
+    id: ID!
+    endAt: String!
+    userId: ID!
+    bedId: ID!
+}
+
+type Query {
+    hospitalisations(payload: FetchHospitalisationInput!):  HospitalisationPage!
+    hospitalisation(id: ID!): Hospitalisation!
+}
+
+type Mutation {
+    createHospitalisation(input: NewHospitalisationInput!): Hospitalisation!
+    updateHospitalisation(input: UpdateHospitalisationInput!): Hospitalisation!
+    deleteHospitalisation(id: ID!): Hospitalisation!
+}

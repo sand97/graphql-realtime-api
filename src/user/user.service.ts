@@ -7,11 +7,11 @@ import {
   UserPage,
 } from '../graphql';
 import { JwtPayload } from '../auth/jwt.strategy';
-import { User, Locale } from '@prisma/client';
+import { User, Locale, Role } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
-import { RenderUser, UserRole } from './user.utils';
+import { RenderUser } from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -42,6 +42,7 @@ export class UserService {
       where: { id },
       data: {
         ...payload,
+        role: payload?.role as Role,
         password:
           (currentUser.role === 'ROOT' || currentUser.id === id) &&
           payload.password
@@ -94,6 +95,9 @@ export class UserService {
       where,
       skip: (page - 1) * limit,
       take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
     })) as any;
     return {
       users,
@@ -140,11 +144,7 @@ export class UserService {
     return user;
   }
 
-  async create(
-    userDto: CreateOrUpdateUserInput & {
-      role?: UserRole;
-    },
-  ): Promise<any> {
+  async create(userDto: CreateOrUpdateUserInput): Promise<any> {
     // // check if the user exists in the db
     const userInDb = await this.prisma.user.findFirst({
       where: { email: userDto.email },
@@ -157,8 +157,8 @@ export class UserService {
     }
     return await this.prisma.user.create({
       data: {
-        role: 'CLIENT' as const,
         ...userDto,
+        role: userDto?.role as Role,
         password: await hash(userDto.password, 10),
       },
     });

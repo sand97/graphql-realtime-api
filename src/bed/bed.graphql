@@ -1,0 +1,41 @@
+type Bed {
+    id: ID!
+    number: Int!
+    level: Int!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type BedPage {
+    data: [Bed!]!
+    count: Int!
+}
+
+
+input FetchBedsInput {
+    page: Int!
+    limit: Int!
+    keyword: String
+}
+
+input NewBedInput {
+    number: Int!
+    level: Int!
+}
+
+input UpdateBedInput {
+    id: ID!
+    number: Int
+    level: Int
+}
+
+type Query {
+    beds(payload: FetchBedsInput!):  BedPage!
+    bed(id: ID!): Bed!
+}
+
+type Mutation {
+    createBed(input: NewBedInput!): Bed!
+    updateBed(input: UpdateBedInput!): Bed!
+    deleteBed(id: ID!): Bed!
+}

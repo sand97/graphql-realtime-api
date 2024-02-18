@@ -11,74 +11,70 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  surname   String?
-  phone     String?
-  email     String   @unique
-  password  String
-  role      Role     @default(CLIENT)
-  avatar    String?
-  language  Locale?  @default(fr)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  medicamentsCreated Medicament[]
+  id               String            @id @default(uuid())
+  name             String
+  surname          String?
+  phone            String?
+  email            String            @unique
+  password         String
+  role             Role              @default(CLIENT)
+  avatar           String?
+  language         Locale?           @default(fr)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  hospitalisations Hospitalisation[]
 }
 
-model Order {
-  id          String   @id @default(uuid())
-  items OrderItem[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Bed {
+  id               String            @id @unique @default(cuid())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  number           Int
+  level            Int?
+
+  @@unique([number, level])
+
+  hospitalisations Hospitalisation[]
 }
 
-model OrderItem {
-  id          String   @id @default(uuid())
-  order       Order    @relation(fields: [orderId], references: [id])
-  orderId     String
-  medicament  Medicament @relation(fields: [medicamentId], references: [id])
-  medicamentId String
-  quantity    Int
-  price       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Hospitalisation {
+  id           String        @id @unique @default(cuid())
+  customer     User          @relation(fields: [userId], references: [id])
+  bed          Bed           @relation(fields: [bedId], references: [id])
+  createdAt    DateTime      @default(now())
+  endAt        DateTime?
+  observations Observation[]
+  userId       String
+  bedId        String
 }
 
-model Category {
-  id          String       @id @default(uuid())
-  name        String
-  description String
-  medicaments Medicament[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+model Equipment {
+  id           String        @id @unique @default(cuid())
+  name         String
+  description  String?
+  serialNumber Int @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  observations Observation[]
 }
 
-model Medicament {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Int
-  stock       Int
-  available   Int @default(0)
-  image       String
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
-
-  orderItems      OrderItem[]
-}
-
-enum Locale {
-  en
-  fr
+model Observation {
+  id                String          @id @unique @default(cuid())
+  value             Float
+  createdAt         DateTime        @default(now())
+  equipment         Equipment       @relation(fields: [equipmentId], references: [id])
+  hospitalisation   Hospitalisation @relation(fields: [hospitalisationId], references: [id])
+  equipmentId       String
+  hospitalisationId String
 }
 
 enum Role {
   ADMIN
   CLIENT
   ROOT
+}
+
+enum Locale {
+  en
+  fr
 }

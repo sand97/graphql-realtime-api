@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
-import { MedicamentModule } from './medicament/medicament.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { join } from 'path';
-import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
@@ -22,6 +20,10 @@ import {
   constraintDirectiveTypeDefs,
 } from 'graphql-constraint-directive';
 import { AssetModule } from './asset/asset.module';
+import { BedModule } from './bed/bed.module';
+import { EquipmentModule } from './equipment/equipment.module';
+import { HospitalisationModule } from './hospitalisation/hospitalisation.module';
+import { ObservationModule } from './observation/observation.module';
 
 @Module({
   imports: [
@@ -35,7 +37,7 @@ import { AssetModule } from './asset/asset.module';
         { use: QueryResolver, options: ['lang', 'locale', 'l'] },
         new HeaderResolver(['x-custom-lang']),
         AcceptLanguageResolver,
-        new CookieResolver(['lang', 'locale', 'l']),
+        // new CookieResolver(['lang', 'locale', 'l']),
       ],
     }),
     ConfigModule.forRoot({
@@ -46,6 +48,12 @@ import { AssetModule } from './asset/asset.module';
       typePaths: ['./**/*.graphql'],
       installSubscriptionHandlers: true,
       typeDefs: [constraintDirectiveTypeDefs],
+      subscriptions: {
+        'graphql-ws': {
+          path: '/graphql',
+        },
+        // 'subscriptions-transport-ws': true,
+      },
       directiveResolvers: {
         constraint: constraintDirective,
       },
@@ -54,12 +62,14 @@ import { AssetModule } from './asset/asset.module';
         outputAs: 'class',
       },
     }),
-    MedicamentModule,
     PrismaModule,
-    CategoryModule,
     AuthModule,
     UserModule,
     AssetModule,
+    BedModule,
+    EquipmentModule,
+    HospitalisationModule,
+    ObservationModule,
   ],
   providers: [],
 })

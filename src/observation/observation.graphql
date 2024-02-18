@@ -1,0 +1,39 @@
+type Observation {
+    id: ID!
+    equipment: Equipment,
+    equipmentId: ID,
+    hospitalisation: Hospitalisation,
+    hospitalisationId: ID,
+    value: Float!
+    createdAt: String!
+}
+
+type LastObservationResult {
+    data: [Observation!]!
+}
+
+
+input LastObservationInput {
+    page: Int!
+    limit: Int!
+    hospitalisationId: ID!
+}
+
+input NewObservationInput {
+    value: Float!
+    equipmentId: ID!,
+    hospitalisationId: ID!,
+}
+
+
+type Query {
+    lastObservations(payload: LastObservationInput!):  LastObservationResult!
+}
+
+type Mutation {
+    createObservation(input: NewObservationInput!): Observation!
+}
+
+type Subscription {
+    observationAdded(hospitalisationId: ID): Observation
+}

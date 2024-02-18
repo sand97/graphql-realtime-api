@@ -12,40 +12,70 @@ export class UpdateAuthInput {
     id: number;
 }
 
-export class NewCategory {
-    name: string;
-    description: string;
-}
-
-export class NewMedicament {
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    image: string;
-    categoryId: string;
-}
-
-export class UpdateCategory {
-    id: string;
-    name?: Nullable<string>;
-    description?: Nullable<string>;
-}
-
-export class FetchMedicamentsInput {
+export class FetchBedsInput {
     page: number;
     limit: number;
     keyword?: Nullable<string>;
 }
 
-export class UpdateMedicament {
+export class NewBedInput {
+    number: number;
+    level: number;
+}
+
+export class UpdateBedInput {
     id: string;
-    name?: Nullable<string>;
+    number?: Nullable<number>;
+    level?: Nullable<number>;
+}
+
+export class FetchEquipmentsInput {
+    page: number;
+    limit: number;
+    keyword?: Nullable<string>;
+}
+
+export class NewEquipmentInput {
     description?: Nullable<string>;
-    price?: Nullable<number>;
-    stock?: Nullable<number>;
-    image?: Nullable<string>;
-    categoryId?: Nullable<string>;
+    name: string;
+    serialNumber: number;
+}
+
+export class UpdateEquipmentInput {
+    id: string;
+    description?: Nullable<string>;
+    name?: Nullable<string>;
+    serialNumber?: Nullable<number>;
+}
+
+export class FetchHospitalisationInput {
+    page: number;
+    limit: number;
+    userId: string;
+}
+
+export class NewHospitalisationInput {
+    userId: string;
+    bedId: string;
+}
+
+export class UpdateHospitalisationInput {
+    id: string;
+    endAt: string;
+    userId: string;
+    bedId: string;
+}
+
+export class LastObservationInput {
+    page: number;
+    limit: number;
+    hospitalisationId: string;
+}
+
+export class NewObservationInput {
+    value: number;
+    equipmentId: string;
+    hospitalisationId: string;
 }
 
 export class FetchUsersInput {
@@ -71,6 +101,7 @@ export class CreateOrUpdateUserInput {
     password: string;
     phone?: Nullable<string>;
     avatar?: Nullable<string>;
+    role?: Nullable<string>;
 }
 
 export class UpdateUserInput {
@@ -80,6 +111,7 @@ export class UpdateUserInput {
     password?: Nullable<string>;
     phone?: Nullable<string>;
     avatar?: Nullable<string>;
+    role?: Nullable<string>;
 }
 
 export class Auth {
@@ -89,13 +121,19 @@ export class Auth {
 export abstract class IQuery {
     abstract auth(id: number): Nullable<Auth> | Promise<Nullable<Auth>>;
 
-    abstract medicaments(payload: FetchMedicamentsInput): MedicamentPage | Promise<MedicamentPage>;
+    abstract beds(payload: FetchBedsInput): BedPage | Promise<BedPage>;
 
-    abstract medicament(id: string): Medicament | Promise<Medicament>;
+    abstract bed(id: string): Bed | Promise<Bed>;
 
-    abstract categories(): Category[] | Promise<Category[]>;
+    abstract equipments(payload: FetchEquipmentsInput): EquipmentPage | Promise<EquipmentPage>;
 
-    abstract category(id: string): Category | Promise<Category>;
+    abstract equipment(id: string): Equipment | Promise<Equipment>;
+
+    abstract hospitalisations(payload: FetchHospitalisationInput): HospitalisationPage | Promise<HospitalisationPage>;
+
+    abstract hospitalisation(id: string): Hospitalisation | Promise<Hospitalisation>;
+
+    abstract lastObservations(payload: LastObservationInput): LastObservationResult | Promise<LastObservationResult>;
 
     abstract login(loginInput: LoginInput): LoginResponse | Promise<LoginResponse>;
 
@@ -109,17 +147,25 @@ export abstract class IMutation {
 
     abstract removeAuth(id: number): Nullable<Auth> | Promise<Nullable<Auth>>;
 
-    abstract createCategory(input: NewCategory): Category | Promise<Category>;
+    abstract createBed(input: NewBedInput): Bed | Promise<Bed>;
 
-    abstract updateCategory(input: UpdateCategory): Category | Promise<Category>;
+    abstract updateBed(input: UpdateBedInput): Bed | Promise<Bed>;
 
-    abstract deleteCategory(id: string): Category | Promise<Category>;
+    abstract deleteBed(id: string): Bed | Promise<Bed>;
 
-    abstract createMedicament(input: NewMedicament): Medicament | Promise<Medicament>;
+    abstract createEquipment(input: NewEquipmentInput): Equipment | Promise<Equipment>;
 
-    abstract updateMedicament(input: UpdateMedicament): Medicament | Promise<Medicament>;
+    abstract updateEquipment(input: UpdateEquipmentInput): Equipment | Promise<Equipment>;
 
-    abstract deleteMedicament(id: string): Medicament | Promise<Medicament>;
+    abstract deleteEquipment(id: string): Equipment | Promise<Equipment>;
+
+    abstract createHospitalisation(input: NewHospitalisationInput): Hospitalisation | Promise<Hospitalisation>;
+
+    abstract updateHospitalisation(input: UpdateHospitalisationInput): Hospitalisation | Promise<Hospitalisation>;
+
+    abstract deleteHospitalisation(id: string): Hospitalisation | Promise<Hospitalisation>;
+
+    abstract createObservation(input: NewObservationInput): Observation | Promise<Observation>;
 
     abstract updateUser(userId: string, updateUserInput: UpdateUserInput): User | Promise<User>;
 
@@ -132,30 +178,64 @@ export abstract class IMutation {
     abstract sign(signInput: CreateOrUpdateUserInput): LoginResponse | Promise<LoginResponse>;
 }
 
-export class Medicament {
+export class Bed {
     id: string;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    image: string;
-    categoryId: string;
-    category: Category;
+    number: number;
+    level: number;
     createdAt: string;
     updatedAt: string;
 }
 
-export class MedicamentPage {
-    medicaments: Medicament[];
+export class BedPage {
+    data: Bed[];
     count: number;
 }
 
-export class Category {
+export class Equipment {
     id: string;
+    description?: Nullable<string>;
     name: string;
-    description: string;
+    serialNumber: number;
     createdAt: string;
     updatedAt: string;
+}
+
+export class EquipmentPage {
+    data: Equipment[];
+    count: number;
+}
+
+export class Hospitalisation {
+    id: string;
+    customer?: Nullable<User>;
+    userId?: Nullable<string>;
+    bed?: Nullable<Bed>;
+    bedId?: Nullable<string>;
+    createdAt: string;
+    endAt: string;
+}
+
+export class HospitalisationPage {
+    data: Hospitalisation[];
+    count: number;
+}
+
+export class Observation {
+    id: string;
+    equipment?: Nullable<Equipment>;
+    equipmentId?: Nullable<string>;
+    hospitalisation?: Nullable<Hospitalisation>;
+    hospitalisationId?: Nullable<string>;
+    value: number;
+    createdAt: string;
+}
+
+export class LastObservationResult {
+    data: Observation[];
+}
+
+export abstract class ISubscription {
+    abstract observationAdded(hospitalisationId?: Nullable<string>): Nullable<Observation> | Promise<Nullable<Observation>>;
 }
 
 export class User {

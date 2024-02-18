@@ -1,0 +1,44 @@
+type Equipment {
+    id: ID!
+    description: String
+    name: String!
+    serialNumber: Int!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type EquipmentPage {
+    data: [Equipment!]!
+    count: Int!
+}
+
+
+input FetchEquipmentsInput {
+    page: Int!
+    limit: Int!
+    keyword: String
+}
+
+input NewEquipmentInput {
+    description: String
+    name: String!
+    serialNumber: Int!
+}
+
+input UpdateEquipmentInput {
+    id: ID!
+    description: String
+    name: String
+    serialNumber: Int
+}
+
+type Query {
+    equipments(payload: FetchEquipmentsInput!):  EquipmentPage!
+    equipment(id: ID!): Equipment!
+}
+
+type Mutation {
+    createEquipment(input: NewEquipmentInput!): Equipment!
+    updateEquipment(input: UpdateEquipmentInput!): Equipment!
+    deleteEquipment(id: ID!): Equipment!
+}
