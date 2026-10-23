@@ -1,4 +1,4 @@
-FROM node:18.11-slim As development
+FROM node:24-slim As development
 
 WORKDIR /usr/src/app
 
@@ -17,7 +17,7 @@ RUN npm run build
 
 
 
-FROM node:18.11-slim as production
+FROM node:24-slim as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
